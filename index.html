@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATELIER 3D — Virtual Fitting Room & Fashion Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <div class="brand-mark">A3</div>
+        <div class="brand-text">
+          <span class="brand-name">ATELIER <strong>3D</strong></span>
+          <span class="brand-sub">Virtual Fitting Marketplace</span>
+        </div>
+      </div>
+
+      <div class="profile-pill" id="activeProfilePill" title="Klik untuk kelola profil tubuh tersimpan">
+        <span class="profile-dot"></span>
+        <span id="profileSummaryText">175 cm • Dada 96 • Pinggang 80</span>
+        <span class="pill-tag" id="bodyShapeBadge">Proporsional</span>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" id="catalogSearch" placeholder="Cari kaos, jaket, blazer, dress, celana..." autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn" id="btnSavedOutfits" title="Outfit Tersimpan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span class="btn-label">Outfit</span>
+        <span class="badge-count" id="savedOutfitCount">0</span>
+      </button>
+
+      <button class="icon-btn" id="btnProfiles" title="Profil Tubuh Tersimpan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="btn-label">Profil Tubuh</span>
+      </button>
+
+      <button class="cart-btn" id="btnOpenCart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>Keranjang</span>
+        <span class="cart-badge" id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main 3-Column Interactive Studio -->
+  <main class="studio-layout">
+    <!-- LEFT PANEL: Mannequin Customization -->
+    <aside class="panel panel-left" id="mannequinPanel">
+      <div class="panel-header">
+        <div>
+          <h2>Studio Manekin 3D</h2>
+          <p>Sesuaikan bentuk & ukuran tubuhmu</p>
+        </div>
+        <button class="btn-mini-ghost" id="btnResetBody" title="Reset ke preset awal">Reset</button>
+      </div>
+
+      <div class="panel-scroll">
+        <!-- Preset Mannequin Body Types -->
+        <section class="control-section">
+          <div class="section-title-row">
+            <h3>Pilih Tipe Manekin</h3>
+            <span class="hint-text">6 opsi dasar</span>
+          </div>
+          <div class="preset-grid" id="presetGrid"></div>
+        </section>
+
+        <!-- Material / Finish -->
+        <section class="control-section">
+          <div class="section-title-row">
+            <h3>Material & Warna Manekin</h3>
+          </div>
+          <div class="material-row" id="materialRow"></div>
+        </section>
+
+        <!-- Custom Body Measurements Sliders -->
+        <section class="control-section">
+          <div class="section-title-row">
+            <h3>Ukuran Tubuhmu (cm)</h3>
+            <button class="link-btn" id="btnQuickSaveProfile">+ Simpan Profil</button>
+          </div>
+
+          <div class="slider-group" id="measurementSliders">
+            <!-- Dynamically populated sliders -->
+          </div>
+
+          <!-- Size Guide Summary Card -->
+          <div class="body-estimate-card">
+            <div class="estimate-row">
+              <span>Estimasi Ukuran Standar</span>
+              <strong id="estimatedBaseSize">Size L</strong>
+            </div>
+            <div class="estimate-row">
+              <span>Tipe Siluet Tubuh</span>
+              <strong id="estimatedSilhouette">Proporsional</strong>
+            </div>
+            <div class="estimate-row">
+              <span>Estimasi Berat Ideal</span>
+              <strong id="estimatedWeight">68 kg</strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- Studio Lighting -->
+        <section class="control-section">
+          <div class="section-title-row">
+            <h3>Pencahayaan Studio</h3>
+          </div>
+          <div class="lighting-row" id="lightingRow">
+            <button class="chip-btn active" data-light="daylight">Daylight</button>
+            <button class="chip-btn" data-light="boutique">Warm Boutique</button>
+            <button class="chip-btn" data-light="editorial">Editorial</button>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <!-- CENTER STAGE: 3D Interactive Canvas & Floating Controls -->
+    <section class="stage-container">
+      <canvas id="threeCanvas"></canvas>
+
+      <!-- WebGL / Loading Overlay -->
+      <div class="stage-loader" id="stageLoader">
+        <div class="loader-spinner"></div>
+        <p id="loaderMessage">Menyiapkan Studio Manekin 3D...</p>
+      </div>
+
+      <!-- TOP FLOATING HUD: Fit Comfort Telemetry -->
+      <div class="hud-top">
+        <div class="comfort-card" id="comfortCard">
+          <div class="comfort-main">
+            <div class="comfort-score-ring" id="comfortRing">
+              <span id="overallComfortScore">--</span>
+            </div>
+            <div class="comfort-meta">
+              <div class="comfort-label">Skor Kenyamanan Outfit</div>
+              <div class="comfort-verdict" id="overallComfortVerdict">Pilih pakaian di katalog untuk uji coba</div>
+            </div>
+          </div>
+          <div class="comfort-actions">
+            <button class="heatmap-toggle" id="btnToggleHeatmap" title="Tampilkan peta tekanan kain di baju 3D">
+              <span class="heat-dot"></span>
+              <span>Heatmap Fit</span>
+            </button>
+            <button class="xray-toggle" id="btnToggleXray" title="Lihat ruang gerak antara kain & tubuh manekin">
+              <span>Mode X-Ray</span>
+            </button>
+            <button class="details-toggle" id="btnToggleFitBreakdown" title="Lihat detail ukuran per bagian tubuh">
+              Detail Fit ▾
+            </button>
+          </div>
+        </div>
+
+        <!-- Expandable Per-Zone Fit Breakdown -->
+        <div class="fit-breakdown-popover hidden" id="fitBreakdownPopover">
+          <div class="breakdown-header">
+            <strong id="breakdownGarmentTitle">Analisis Kenyamanan Kain</strong>
+            <span class="rec-pill" id="breakdownRecSize">Rec: L</span>
+          </div>
+          <div class="breakdown-zones" id="breakdownZones"></div>
+          <div class="heatmap-legend">
+            <span><i style="background:#3b82f6"></i>Longgar</span>
+            <span><i style="background:#10b981"></i>Pas & Nyaman</span>
+            <span><i style="background:#f59e0b"></i>Agak Ketat</span>
+            <span><i style="background:#ef4444"></i>Terlalu Sempit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM-LEFT FLOATING HUD: Equipped Outfit Layers -->
+      <div class="hud-equipped" id="equippedPanel">
+        <div class="equipped-header">
+          <span>Sedang Dipakai di Manekin</span>
+          <div class="equipped-header-actions">
+            <button class="mini-action" id="btnSaveCurrentOutfit" title="Simpan kombinasi outfit ini">Simpan</button>
+            <button class="mini-action danger" id="btnClearOutfit" title="Lepas semua pakaian">Lepas</button>
+          </div>
+        </div>
+        <div class="equipped-list" id="equippedList"></div>
+      </div>
+
+      <!-- BOTTOM-CENTER FLOATING HUD: Camera & Pose Controls -->
+      <div class="hud-bottom">
+        <div class="hud-pill-group">
+          <span class="hud-group-label">Kamera</span>
+          <button class="hud-btn active" data-cam="full">Full Body</button>
+          <button class="hud-btn" data-cam="upper">Atasan</button>
+          <button class="hud-btn" data-cam="side">Samping</button>
+          <button class="hud-btn" data-cam="back">Belakang</button>
+          <button class="hud-btn" data-cam="shoes">Sepatu</button>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <div class="hud-pill-group">
+          <span class="hud-group-label">Tes Gerak</span>
+          <button class="hud-btn active" data-pose="idle">Berdiri</button>
+          <button class="hud-btn" data-pose="raiseArms">Angkat Tangan</button>
+          <button class="hud-btn" data-pose="walk">Jalan</button>
+          <button class="hud-btn" id="btnAutoRotate" title="Putar manekin 360 derajat">↻ 360°</button>
+        </div>
+      </div>
+
+      <!-- Subtle Drag Hint -->
+      <div class="drag-hint">Geser untuk putar 360° • Scroll untuk zoom</div>
+    </section>
+
+    <!-- RIGHT PANEL: Interactive Fashion Marketplace Catalog -->
+    <aside class="panel panel-right" id="catalogPanel">
+      <div class="panel-header">
+        <div>
+          <h2>Katalog Fashion 3D</h2>
+          <p id="catalogSubtext">Skor kecocokan otomatis sesuai manekinmu</p>
+        </div>
+        <select id="catalogSort" class="sort-select" aria-label="Urutkan produk">
+          <option value="fit">Paling Nyaman</option>
+          <option value="popular">Terpopuler</option>
+          <option value="price-asc">Harga Terendah</option>
+          <option value="price-desc">Harga Tertinggi</option>
+        </select>
+      </div>
+
+      <!-- Curated 1-Click Outfit Looks -->
+      <div class="looks-strip">
+        <span class="looks-label">Look Siap Pakai:</span>
+        <div class="looks-row" id="curatedLooksRow"></div>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="category-tabs" id="categoryTabs">
+        <button class="cat-tab active" data-cat="all">Semua</button>
+        <button class="cat-tab" data-cat="top">Atasan</button>
+        <button class="cat-tab" data-cat="outer">Jaket & Outer</button>
+        <button class="cat-tab" data-cat="bottom">Bawahan</button>
+        <button class="cat-tab" data-cat="dress">Dress</button>
+        <button class="cat-tab" data-cat="shoes">Sepatu</button>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="panel-scroll catalog-scroll">
+        <div class="catalog-grid" id="catalogGrid"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- PRODUCT DETAIL & FIT COMPARISON MODAL -->
+  <div class="modal-backdrop hidden" id="productModalBackdrop">
+    <div class="modal-card" id="productModal">
+      <button class="modal-close" id="closeProductModal">✕</button>
+      <div id="productModalContent"></div>
+    </div>
+  </div>
+
+  <!-- BODY PROFILES MODAL -->
+  <div class="modal-backdrop hidden" id="profilesModalBackdrop">
+    <div class="modal-card modal-sm">
+      <button class="modal-close" id="closeProfilesModal">✕</button>
+      <div class="modal-header-simple">
+        <h3>Profil Tubuh Tersimpan</h3>
+        <p>Simpan ukuran tubuhmu, pasangan, atau keluarga agar tinggal sekali klik saat belanja.</p>
+      </div>
+      <div class="profile-save-form">
+        <input type="text" id="newProfileName" placeholder="Nama profil (cth: Ukuran Saya, Kado Ayah)" />
+        <button class="btn-primary" id="btnConfirmSaveProfile">Simpan Ukuran Saat Ini</button>
+      </div>
+      <div class="saved-profiles-list" id="savedProfilesList"></div>
+    </div>
+  </div>
+
+  <!-- SAVED OUTFITS MODAL -->
+  <div class="modal-backdrop hidden" id="outfitsModalBackdrop">
+    <div class="modal-card modal-sm">
+      <button class="modal-close" id="closeOutfitsModal">✕</button>
+      <div class="modal-header-simple">
+        <h3>Kombinasi Outfit Tersimpan</h3>
+        <p>Klik untuk langsung pasangkan ulang ke manekin 3D atau masukkan semua ke keranjang.</p>
+      </div>
+      <div class="saved-outfits-list" id="savedOutfitsList"></div>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER CART & CHECKOUT DRAWER -->
+  <div class="drawer-backdrop hidden" id="cartDrawerBackdrop">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <div>
+          <h3>Keranjang Belanja</h3>
+          <p>Dilengkapi verifikasi kecocokan ukuran manekin</p>
+        </div>
+        <button class="modal-close-inline" id="closeCartDrawer">✕</button>
+      </div>
+
+      <div class="drawer-body" id="cartItemsContainer"></div>
+
+      <div class="drawer-footer">
+        <div class="promo-row">
+          <input type="text" id="promoInput" placeholder="Kode promo (coba: FIT3D)" />
+          <button class="btn-secondary" id="btnApplyPromo">Pakai</button>
+        </div>
+        <div class="promo-status" id="promoStatus"></div>
+
+        <div class="summary-lines">
+          <div class="summary-line"><span>Subtotal</span><strong id="cartSubtotal">Rp 0</strong></div>
+          <div class="summary-line hidden" id="cartDiscountRow"><span>Diskon Promo (15%)</span><strong class="text-green" id="cartDiscount">-Rp 0</strong></div>
+          <div class="summary-line"><span>Pengiriman Studio Express</span><strong class="text-green">Gratis</strong></div>
+          <div class="summary-line total"><span>Total Pembayaran</span><strong id="cartTotal">Rp 0</strong></div>
+        </div>
+
+        <button class="btn-primary btn-full" id="btnCheckout">Checkout Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Three.js r147 UMD with CDN fallback -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"
+          onerror="this.onerror=null;this.src='https://unpkg.com/three@0.147.0/build/three.min.js';"></script>
+
+  <!-- Application Modules (Classic scripts for 100% file:// and HTTP compatibility) -->
+  <script src="js/catalogData.js"></script>
+  <script src="js/fitEngine.js"></script>
+  <script src="js/fabricTextures.js"></script>
+  <script src="js/mannequin3d.js"></script>
+  <script src="js/garments3d.js"></script>
+  <script src="js/sceneManager.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
